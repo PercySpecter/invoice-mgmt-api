@@ -1,0 +1,33 @@
+{
+  "name": "invoice-mgmt-api",
+  "version": "1.0.0",
+  "description": "API for Invoice Management System",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PercySpecter/invoice-mgmt-api.git"
+  },
+  "author": "kinjal-ray",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PercySpecter/invoice-mgmt-api/issues"
+  },
+  "homepage": "https://github.com/PercySpecter/invoice-mgmt-api#readme",
+  "dependencies": {
+    "bcrypt": "^3.0.7",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.4.1",
+    "mongoose": "^5.8.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
