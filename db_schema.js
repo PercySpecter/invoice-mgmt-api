@@ -1,7 +1,6 @@
 
 var uri = 'mongodb://localhost:27017/invoice';
 
-var _ = require('lodash');
 var mongoose = require('mongoose');
 mongoose.connect(uri);
 
@@ -16,4 +15,12 @@ var userSchema = mongoose.Schema ({
   password: String
 });
 
+var customerSchema = mongoose.Schema ({
+  id: Number,
+  name: String,
+  address: String,
+  phone: String
+});
+
 exports.User = mongoose.model('User', userSchema);
+exports.Customer = mongoose.model('Customer', customerSchema);
