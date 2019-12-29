@@ -19,6 +19,7 @@ const saltRounds = 12;
 
 const User = require('./db_schema').User;
 const Customer = require('./db_schema').Customer;
+const Product = require('./db_schema').Product;
 /*Required Dependencies end*/
 
 
@@ -118,6 +119,7 @@ app.post('/auth', bodyParser, (req , res) => {
 //     res.json(req.user);
 // })
 
+/***Customer API start***/
 /*Add new Customer*/
 app.post('/api/customers' , [bodyParser, isAuthenticated], (req , res) => {
   Customer.find({} , (error , customers) => {
@@ -187,6 +189,79 @@ app.delete('/api/customers/:id', isAuthenticated, (req , res) => {
     res.json(result);
   });
 });
+/***Customer API end***/
+
+/***Product API start***/
+/*Add new Product*/
+app.post('/api/products' , [bodyParser, isAuthenticated], (req , res) => {
+  Product.find({} , (error , products) => {
+    let id = products.reduce((max , curr) => {
+      max = curr.id > max ? curr.id : max;
+      return max;
+    } , 0);
+
+    let product = {
+              "id": id,
+              "name": "",
+              "price": 0
+           };
+    Object.assign(product , req.body);
+    product.id = id + 1;
+    console.log(product);
+    Product.create(product , (error , new_product) => {
+      console.log(new_product);
+      res.json(new_product);
+    });
+  });
+});
+
+/*List all Products*/
+app.get('/api/products', isAuthenticated, (req , res) => {
+  Product.find({} , (error , products) => {
+    res.json(products);
+  });
+});
+
+/*Details of Product by id*/
+app.get('/api/products/:id', isAuthenticated, (req , res) => {
+  const id = req.params.id;
+  Product.findOne({id: id} , (error , product) => {
+    res.json(product);
+  });
+});
+
+/*Edit details of a Product*/
+app.put('/api/products/:id', [bodyParser, isAuthenticated], (req , res) => {
+  const id = req.params.id;
+  try {
+    Product.findOne({id: id} , (error , product) => {
+      if(product == null)
+      {
+        res.sendStatus(404);
+      }
+      else
+      {
+        Object.assign(product , req.body);
+        product.id = id;
+        Product.findOneAndUpdate({id: id} , product , () => {});
+        res.json(product);
+      }
+    });
+  }
+  catch (e) {
+    res.sendStatus(404);
+  }
+});
+
+/*Delete a Product*/
+app.delete('/api/products/:id', isAuthenticated, (req , res) => {
+  const id = req.params.id;
+  Product.deleteOne({id: id} , (error , result) => {
+    res.json(result);
+  });
+});
+
+/***Product API start***/
 
 
 var server = app.listen(4000, function () {

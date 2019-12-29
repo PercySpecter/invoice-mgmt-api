@@ -22,5 +22,12 @@ var customerSchema = mongoose.Schema ({
   phone: String
 });
 
+var productSchema = mongoose.Schema ({
+  id: Number,
+  name: String,
+  price: Number
+});
+
 exports.User = mongoose.model('User', userSchema);
 exports.Customer = mongoose.model('Customer', customerSchema);
+exports.Product = mongoose.model('Product', productSchema);
