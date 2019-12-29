@@ -21,6 +21,7 @@ const User = require('./db_schema').User;
 const Customer = require('./db_schema').Customer;
 const Product = require('./db_schema').Product;
 const Invoice = require('./db_schema').Invoice;
+const InvoiceItem = require('./db_schema').InvoiceItem;
 /*Required Dependencies end*/
 
 
@@ -261,6 +262,7 @@ app.delete('/api/products/:id', isAuthenticated, (req , res) => {
     res.json(result);
   });
 });
+/***Product API end***/
 
 /***Invoice API start***/
 /*Add new Invoice*/
@@ -302,7 +304,7 @@ app.get('/api/invoices/:id', isAuthenticated, (req , res) => {
   });
 });
 
-/*Edit details of a Invoice*/
+/*Edit details of an Invoice*/
 app.put('/api/invoices/:id', [bodyParser, isAuthenticated], (req , res) => {
   const id = req.params.id;
   try {
@@ -325,15 +327,93 @@ app.put('/api/invoices/:id', [bodyParser, isAuthenticated], (req , res) => {
   }
 });
 
-/*Delete a Invoice*/
+/*Delete an Invoice*/
 app.delete('/api/invoices/:id', isAuthenticated, (req , res) => {
   const id = req.params.id;
   Invoice.deleteOne({id: id} , (error , result) => {
     res.json(result);
   });
 });
+/***Invoice API end***/
 
-/***Product API start***/
+/***InvoiceItem API start***/
+/*Add new InvoiceItem*/
+app.post('/api/invoices/:inv_id/items' , [bodyParser, isAuthenticated], (req , res) => {
+  const inv_id = req.params.inv_id;
+  InvoiceItem.find({invoice_id: inv_id} , (error , invoiceItems) => {
+    let id = invoiceItems.reduce((max , curr) => {
+      max = curr.id > max ? curr.id : max;
+      return max;
+    } , 0);
+
+    let invoiceItem = {
+              "id": id,
+              "invoice_id": inv_id,
+              "product_id": 0,
+              "quantity": 0
+           };
+    Object.assign(invoiceItem , req.body);
+    invoiceItem.id = id + 1;
+    invoiceItem.invoice_id = inv_id;
+    console.log(invoiceItem);
+    InvoiceItem.create(invoiceItem , (error , new_invoiceItem) => {
+      console.log(new_invoiceItem);
+      res.json(new_invoiceItem);
+    });
+  });
+});
+
+/*List all InvoiceItems*/
+app.get('/api/invoices/:inv_id/items', isAuthenticated, (req , res) => {
+  const inv_id = req.params.inv_id;
+  InvoiceItem.find({invoice_id: inv_id} , (error , invoiceItems) => {
+    res.json(invoiceItems);
+  });
+});
+
+/*Details of InvoiceItem by id*/
+app.get('/api/invoices/:inv_id/items/:id', isAuthenticated, (req , res) => {
+  const id = req.params.id;
+  const inv_id = req.params.inv_id;
+  InvoiceItem.findOne({invoice_id: inv_id, id: id} , (error , invoiceItem) => {
+    res.json(invoiceItem);
+  });
+});
+
+/*Edit details of an InvoiceItem*/
+app.put('/api/invoices/:inv_id/items/:id', [bodyParser, isAuthenticated], (req , res) => {
+  const id = req.params.id;
+  const inv_id = req.params.inv_id;
+  try {
+    InvoiceItem.findOne({invoice_id: inv_id, id: id} , (error , invoiceItem) => {
+      if(invoiceItem == null)
+      {
+        res.sendStatus(404);
+      }
+      else
+      {
+        Object.assign(invoiceItem , req.body);
+        invoiceItem.id = id;
+        invoiceItem.invoice_id = inv_id;
+        InvoiceItem.findOneAndUpdate({invoice_id: inv_id, id: id} , invoiceItem , () => {});
+        res.json(invoiceItem);
+      }
+    });
+  }
+  catch (e) {
+    res.sendStatus(404);
+  }
+});
+
+/*Delete an InvoiceItem*/
+app.delete('/api/invoices/:inv_id/items/:id', isAuthenticated, (req , res) => {
+  const id = req.params.id;
+  const inv_id = req.params.inv_id;
+  InvoiceItem.deleteOne({invoice_id: inv_id, id: id} , (error , result) => {
+    res.json(result);
+  });
+});
+/***InvoiceItem API end***/
 
 
 var server = app.listen(4000, function () {

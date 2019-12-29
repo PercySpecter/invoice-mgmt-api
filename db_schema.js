@@ -35,7 +35,15 @@ var invoiceSchema = mongoose.Schema ({
   total: Number
 });
 
+var invoiceItemSchema = mongoose.Schema ({
+  id: Number,
+  invoice_id: Number,
+  product_id: Number,
+  quantity: Number
+});
+
 exports.User = mongoose.model('User', userSchema);
 exports.Customer = mongoose.model('Customer', customerSchema);
 exports.Product = mongoose.model('Product', productSchema);
 exports.Invoice = mongoose.model('Invoice', invoiceSchema);
+exports.InvoiceItem = mongoose.model('InvoiceItem', invoiceItemSchema);
