@@ -28,6 +28,14 @@ var productSchema = mongoose.Schema ({
   price: Number
 });
 
+var invoiceSchema = mongoose.Schema ({
+  id: Number,
+  customer_id: Number,
+  discount: Number,
+  total: Number
+});
+
 exports.User = mongoose.model('User', userSchema);
 exports.Customer = mongoose.model('Customer', customerSchema);
 exports.Product = mongoose.model('Product', productSchema);
+exports.Invoice = mongoose.model('Invoice', invoiceSchema);

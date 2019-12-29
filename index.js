@@ -20,6 +20,7 @@ const saltRounds = 12;
 const User = require('./db_schema').User;
 const Customer = require('./db_schema').Customer;
 const Product = require('./db_schema').Product;
+const Invoice = require('./db_schema').Invoice;
 /*Required Dependencies end*/
 
 
@@ -76,7 +77,7 @@ app.post('/new' , bodyParser, (req , res) => {
 });
 
 /*Get list of Users*/
-app.get('/users', function (req, res) {
+app.get('/users', (req, res) => {
   try {
     User.find({} , (error , users) => {
       let unames = users.map((user) => user.username);
@@ -257,6 +258,77 @@ app.put('/api/products/:id', [bodyParser, isAuthenticated], (req , res) => {
 app.delete('/api/products/:id', isAuthenticated, (req , res) => {
   const id = req.params.id;
   Product.deleteOne({id: id} , (error , result) => {
+    res.json(result);
+  });
+});
+
+/***Invoice API start***/
+/*Add new Invoice*/
+app.post('/api/invoices' , [bodyParser, isAuthenticated], (req , res) => {
+  Invoice.find({} , (error , invoices) => {
+    let id = invoices.reduce((max , curr) => {
+      max = curr.id > max ? curr.id : max;
+      return max;
+    } , 0);
+
+    let invoice = {
+              "id": id,
+              "customer_id": 0,
+              "discount": 0,
+              "total": 0
+           };
+    Object.assign(invoice , req.body);
+    invoice.id = id + 1;
+    console.log(invoice);
+    Invoice.create(invoice , (error , new_invoice) => {
+      console.log(new_invoice);
+      res.json(new_invoice);
+    });
+  });
+});
+
+/*List all Invoices*/
+app.get('/api/invoices', isAuthenticated, (req , res) => {
+  Invoice.find({} , (error , invoices) => {
+    res.json(invoices);
+  });
+});
+
+/*Details of Invoice by id*/
+app.get('/api/invoices/:id', isAuthenticated, (req , res) => {
+  const id = req.params.id;
+  Invoice.findOne({id: id} , (error , invoice) => {
+    res.json(invoice);
+  });
+});
+
+/*Edit details of a Invoice*/
+app.put('/api/invoices/:id', [bodyParser, isAuthenticated], (req , res) => {
+  const id = req.params.id;
+  try {
+    Invoice.findOne({id: id} , (error , invoice) => {
+      if(invoice == null)
+      {
+        res.sendStatus(404);
+      }
+      else
+      {
+        Object.assign(invoice , req.body);
+        invoice.id = id;
+        Invoice.findOneAndUpdate({id: id} , invoice , () => {});
+        res.json(invoice);
+      }
+    });
+  }
+  catch (e) {
+    res.sendStatus(404);
+  }
+});
+
+/*Delete a Invoice*/
+app.delete('/api/invoices/:id', isAuthenticated, (req , res) => {
+  const id = req.params.id;
+  Invoice.deleteOne({id: id} , (error , result) => {
     res.json(result);
   });
 });
