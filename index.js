@@ -98,7 +98,7 @@ app.post('/auth', bodyParser, (req , res) => {
     console.log(user);
     if(error || user == null)
     {
-      res.sendStatus(403);
+      res.send({token: ''});
     }
     else
     {
@@ -110,7 +110,7 @@ app.post('/auth', bodyParser, (req , res) => {
         }
         else
         {
-          res.sendStatus(403);
+          res.send({token: ''});
         }
       })
     }
