@@ -330,6 +330,7 @@ app.put('/api/invoices/:id', [bodyParser, isAuthenticated], (req , res) => {
 /*Delete an Invoice*/
 app.delete('/api/invoices/:id', isAuthenticated, (req , res) => {
   const id = req.params.id;
+  InvoiceItem.deleteMany({invoice_id: id} , (error , result) => {});
   Invoice.deleteOne({id: id} , (error , result) => {
     res.json(result);
   });
